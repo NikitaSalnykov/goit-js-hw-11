@@ -1,5 +1,7 @@
 import './css/style.css';
 import Notiflix from 'notiflix';
+import SimpleLightbox from 'simplelightbox';
+import "simplelightbox/dist/simple-lightbox.min.css";
 const axios = require('axios').default;
 
 
@@ -28,6 +30,10 @@ function onClickSubmit(event) {
             Notiflix.Notify.success(`Hooray! We found ${response.data.total} images`);
             console.log(response.data);
             listEL.insertAdjacentHTML('beforeEnd', createMarkup(response.data.hits))
+            
+            let gallerySlider = new SimpleLightbox('.gallery a',
+            { captionsData: 'alt', captionDelay: 950, navText: ['❮', '❯'] });
+
         })
         .catch((erorr) => {
             console.error(erorr)
@@ -37,9 +43,10 @@ function onClickSubmit(event) {
 
 function createMarkup(arr) {
     return arr.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => 
- `  <li class="serch-item">
-     <div class="photo-card">
+ `  <li class="serch-item photo-card">
+      <a class="gallery__link" href=${largeImageURL}>
       <img src="${webformatURL}" alt="${tags}" class="serch-image">
+      </a>
      <div class="info">
     <p  class="info-item">
        <b>Likes</b> ${likes}
@@ -53,12 +60,12 @@ function createMarkup(arr) {
     <p  class="info-item">
      <b>Downloads</b> ${downloads}
     </p>
-      </div>
     </div>
   </li>`
     ).join('')
+
+    
 }
 
 formEl.addEventListener('submit', onClickSubmit);
-
 
