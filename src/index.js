@@ -10,26 +10,31 @@ const BASE_URL = `https://pixabay.com/api/`
 
 const formEl = document.querySelector('.search-form');
 const listEL = document.querySelector('.search-list-js')
+const inputEl = document.querySelector('input[name="searchQuery"]')
+
+
 
 function onClickSubmit(event) {
 
-    listEL.innerHTML = ''
 
     event.preventDefault();
 
-    const input = event.currentTarget.elements['searchQuery']
-    const searchResponse = input.value.split(' ').join('+')
+    getImages(1)
 
-    axios.get(`${BASE_URL}?key=${API_KEY}&q=${searchResponse}&image_type=photo&orientation=horizontal&safesearch=true`)
+}
+
+function getImages(page) {
+    
+    getFetch(page)
         .then((response) => {
             if (response.data.hits.length === 0) {
-                Notiflix.Notify.failure(`Oooops! No images found for query <i>'${input.value}</i>'`);
-                listEL.innerHTML = `<p>Oooops! No images found for query <i>'${input.value}</i>'. Try again!</p>`
+                Notiflix.Notify.failure(`Oooops! No images found for query <i>'${inputEl.value}</i>'`);
+                listEL.innerHTML = `<p>Oooops! No images found for query <i>'${inputEl.value}</i>'. Try again!</p>`
                 return
             }
             Notiflix.Notify.success(`Hooray! We found ${response.data.total} images`);
             console.log(response.data);
-            listEL.insertAdjacentHTML('beforeEnd', createMarkup(response.data.hits))
+            listEL.innerHTML = createMarkup(response.data.hits)
             
             let gallerySlider = new SimpleLightbox('.gallery a',
             { captionsData: 'alt', captionDelay: 950, navText: ['❮', '❯'] });
@@ -38,7 +43,12 @@ function onClickSubmit(event) {
         .catch((erorr) => {
             console.error(erorr)
         })
+}
 
+function getFetch(page) {
+    const params = new URLSearchParams({ image_types: 'photo', orientation: 'horizontal', safesearch: 'true', per_page: 40, page, })
+    const searchResponse = inputEl.value.split(' ').join('+')
+    return axios.get(`${BASE_URL}?key=${API_KEY}&q=${searchResponse}&${params}`)
 }
 
 function createMarkup(arr) {
@@ -63,8 +73,7 @@ function createMarkup(arr) {
     </div>
   </li>`
     ).join('')
-
-    
+  
 }
 
 formEl.addEventListener('submit', onClickSubmit);
