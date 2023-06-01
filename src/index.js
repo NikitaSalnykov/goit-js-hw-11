@@ -86,6 +86,7 @@ async function onLoad(entries, observer) {
   try {
     entries.forEach(async (entry) => {
       if (entry.isIntersecting) {
+       
         console.log(entries);
         currentPage += 1;
 
