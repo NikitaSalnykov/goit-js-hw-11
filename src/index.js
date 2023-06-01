@@ -3,7 +3,7 @@ import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import "simplelightbox/dist/simple-lightbox.min.css";
 import createMarkup from './script/list-photos-markup';
-
+import smoothScroll from './script/smooth-scroll'
 
 // variables
 
@@ -82,29 +82,29 @@ async function getImages(page, perPage) {
         }
 }
 
-async function onLoad(entries, observer) {
-  try {
-    entries.forEach(async (entry) => {
-      if (entry.isIntersecting) {
-       
-        console.log(entries);
-        currentPage += 1;
-
-        const response = await getFetch(currentPage, perPage);
-        console.log(response);
-
-        listEL.insertAdjacentHTML('beforeend', createMarkup(response.data.hits));
-        gallerySlider.refresh();
-
-        if (currentPage * perPage >= response.data.totalHits) {
-          setTimeout(() => {
-            Notiflix.Notify.info(`We're sorry, but you've reached the end of search results`);
-          }, 2000);
-        }
-        observer.unobserve(target);
-      }
-    });
-  } catch (error) {
-    console.error(error);
+function onLoad(entries, observer) {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      console.log(entries);
+      currentPage += 1
+      getFetch(currentPage, perPage)
+          .then(response => {
+          console.log();
+              listEL.insertAdjacentHTML('beforeend', createMarkup(response.data.hits))
+            gallerySlider.refresh()
+              if (currentPage * perPage >= response.data.totalHits) {
+              setTimeout(() => {
+                Notiflix.Notify.info(`We're sorry, but you've reached the end of search results`);
+              }, 2000);
+              observer.unobserve(target)
+            }
+            
+            observer.observe(target);
+            
+            smoothScroll()
+            
+          })
+  .catch(err => console.log(err));
   }
-}
+  })
+  }
