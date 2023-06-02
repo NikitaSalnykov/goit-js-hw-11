@@ -92,11 +92,12 @@ function onLoad(entries, observer) {
           console.log();
               listEL.insertAdjacentHTML('beforeend', createMarkup(response.data.hits))
             gallerySlider.refresh()
-              if (currentPage * perPage >= response.data.totalHits) {
+              if (currentPage * perPage >= response.data.totalHits && currentPage !== 2) {
               setTimeout(() => {
                 Notiflix.Notify.info(`We're sorry, but you've reached the end of search results`);
               }, 2000);
-              observer.unobserve(target)
+                observer.unobserve(target)
+                return
             }
             
             observer.observe(target);
