@@ -11,13 +11,13 @@ const axios = require('axios').default;
 
 const API_KEY = `36868675-d04d7da5b1942ea7b304f9f1a`;
 const BASE_URL = `https://pixabay.com/api/`
-const perPage = 40
 
 const formEl = document.querySelector('.search-form');
 const listEL = document.querySelector('.search-list-js')
 const inputEl = document.querySelector('input[name="searchQuery"]')
 const target = document.querySelector('.js-guard');
 
+let perPage = 40
 let gallerySlider;
 
 let options = {
@@ -34,8 +34,10 @@ let currentPage = 1
 formEl.addEventListener('submit', onClickSubmit);
 
 function onClickSubmit(event) {
-    event.preventDefault();
-    getImages(1)
+
+  event.preventDefault();
+  currentPage = 1
+  getImages(1, 40)
 }
 
 async function getFetch(page, perPage) {    
@@ -47,8 +49,7 @@ async function getFetch(page, perPage) {
       per_page: perPage,
       page,
     })
-
-    const searchResponse = inputEl.value.split(' ').join('+')
+    const searchResponse = inputEl.value.trim()
     const response = axios.get(`${BASE_URL}?key=${API_KEY}&q=${searchResponse}&${params}`)
     return response
   } catch (error) {
@@ -57,6 +58,11 @@ async function getFetch(page, perPage) {
   }
 
 async function getImages(page, perPage) {
+
+  if (inputEl.value.trim() === '') {
+    return Notiflix.Notify.failure(`Request cannot be empty`);
+}
+
   try {
     const response = await getFetch(page, perPage);
     
@@ -66,7 +72,7 @@ async function getImages(page, perPage) {
           return
         }
         
-        Notiflix.Notify.success(`Hooray! We found ${response.data.total} images`);
+        Notiflix.Notify.success(`Hooray! We found ${response.data.totalHits} images`);
         
         console.log(response.data);
         
